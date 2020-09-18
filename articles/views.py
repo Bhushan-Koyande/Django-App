@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .models import Article
+from .models import Article, Comment
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from . import forms
@@ -12,7 +12,27 @@ def article_list(request):
 def article_details(request, slug):
     #return HttpResponse(slug)
     article=Article.objects.get(slug=slug)
-    return render(request,'articles/article_detail.html',{'article':article})
+    comments = article.comments.filter(active=False)
+    new_comment = None
+    # Comment posted
+    if request.method == 'POST':
+        comment_form = forms.CommentForm(data=request.POST)
+        if comment_form.is_valid():
+
+            # Create Comment object but don't save to database yet
+            new_comment = comment_form.save(commit=False)
+            # Assign the current post to the comment
+            new_comment.post = article
+            # Save the comment to the database
+            new_comment.save()
+    else:
+        comment_form = forms.CommentForm()
+
+    return render(request, 'articles/article_detail.html', {'article': article,
+                                           'comments': comments,
+                                           'new_comment': new_comment,
+                                           'comment_form': comment_form})
+    #return render(request,'articles/article_detail.html',{'article':article})
 
 @login_required(login_url="/accounts/login/")
 def article_create(request):

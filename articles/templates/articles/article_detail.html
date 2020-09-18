@@ -9,6 +9,42 @@
       <p>{{article.date}}</p>
     </div>
 
+    <div class="col-md-8 card mb-4  mt-3 ">
+      <div class="card-body">
+        <!-- comments -->
+        <h2>{{ comments.count }} comments</h2>
+
+        {% for comment in comments %}
+        <div class="article" style="padding: 10px;">
+          <p class="comment">
+            by {{ comment.name }}
+            <span class="comment">
+              on {{ comment.created_on }}
+            </span>
+          </p>
+          <bold>{{ comment.body | linebreaks }}</bold>
+        </div>
+        <hr>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="article">
+      <div class="card-body">
+        {% if new_comment %}
+        <div class="alert alert-success" role="alert">
+          Your comment is awaiting moderation
+        </div>
+        {% else %}
+        <h3>Leave a comment</h3>
+        <form method="post" style="margin-top: 1.3em;">
+          {{ comment_form.as_p }}
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary  btn-lg">Submit</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
   </div>
 
